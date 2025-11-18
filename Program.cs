@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using OlimpikonokAPI.Models;
 using System.Text.Json.Serialization;
 
@@ -13,10 +12,7 @@ namespace OlimpikonokAPI
 var connStr = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 
 builder.Services.AddDbContext<OlimpikonokContext>(options =>
-    options.UseMySql(
-        connStr,
-        ServerVersion.AutoDetect(connStr)
-    )
+    options.UseMySQL(connStr)
 );
             builder.Services.AddControllers();
             builder.Services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
