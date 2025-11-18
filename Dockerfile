@@ -15,4 +15,4 @@ WORKDIR /app
 COPY --from=build /app/out .
 
 # Alkalmazás indítása
-ENTRYPOINT ["dotnet", "olimpikonok.dll"]
+ENTRYPOINT ["dotnet", "olimpikonokAPI.dll"]
