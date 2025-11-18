@@ -1,0 +1,13 @@
+{
+  "id": 0,
+  "nev": "Darnyi Tamás",
+  "neme": true,
+  "szulDatum": "1967-06-03",
+  "sportagId": 2,
+  "ermek": 4,
+  "orszagId": 1,
+  "indexKep": null,
+  "kep": null,
+  "orszag": null,
+  "sportag": null
+}
