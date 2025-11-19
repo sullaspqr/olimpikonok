@@ -38,7 +38,6 @@ namespace OlimpikonokAPI
             
             app.UseSwagger();
             app.UseSwaggerUI();
-            app.UseHttpsRedirection();
             app.UseAuthorization();
             app.MapControllers();
             app.Run();
