@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Az összes fájl másolása a konténerbe
 COPY . .
-COPY aiven_ca.pem /etc/secrets/aiven_ca.pem
+
 # Restore és build
 RUN dotnet restore
 RUN dotnet publish -c Release -o /app/out
