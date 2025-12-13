@@ -13,11 +13,12 @@ namespace OlimpikonokAPI
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
-            // DbContext hozzáadása
-            builder.Services.AddDbContext<OlimpikonokContext>(options => 
-                  options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
-            builder.Services.AddControllers();
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+            builder.Services.AddDbContext<OlimpikonokContext>(options =>
+                options.UseMySql(
+                    connectionString,ServerVersion.AutoDetect(connectionString)));
+            
             builder.Services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
