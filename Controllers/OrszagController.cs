@@ -1,4 +1,3 @@
-﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OlimpikonokAPI.Models;
 
@@ -8,130 +7,111 @@ namespace OlimpikonokAPI.Controllers
     [ApiController]
     public class OrszagController : ControllerBase
     {
+        private readonly OlimpikonokContext _context;
+
+        // DI a DbContext-hez
+        public OrszagController(OlimpikonokContext context)
+        {
+            _context = context;
+        }
+
         [HttpGet("GetAll")]
         public IActionResult GetAll()
         {
-            using (var context = new OlimpikonokContext())
+            try
             {
-                try
+                var orszagok = _context.Orszags.ToList();
+                return Ok(orszagok);
+            }
+            catch (Exception ex)
+            {
+                var hiba = new Orszag
                 {
-                    List<Orszag> orszagok = context.Orszags.ToList();
-                    return Ok(orszagok);
-                }
-                catch (Exception ex)
-                {
-                    List<Orszag> valasz = new List<Orszag>();
-                    Orszag hiba = new Orszag() {
-                        Id = -1,
-                        Nev = $"Hiba a betöltés során: {ex.Message}"
-                    };
-                    valasz.Add(hiba);
-                    return BadRequest(valasz);
-                }
+                    Id = -1,
+                    Nev = $"Hiba a betöltés során: {ex.Message}"
+                };
+                return BadRequest(new[] { hiba });
             }
         }
 
         [HttpGet("GetById")]
         public IActionResult GetById(int id)
         {
-            using (var context = new OlimpikonokContext())
+            try
             {
-                try
+                var eredmeny = _context.Orszags.FirstOrDefault(o => o.Id == id);
+                if (eredmeny != null)
+                    return Ok(eredmeny);
+
+                return NotFound(new Orszag
                 {
-                    Orszag eredmeny = context.Orszags.FirstOrDefault(o =>  o.Id == id);
-                    if (eredmeny != null)
-                        return Ok(eredmeny);
-                    else
-                    {
-                        Orszag hiba = new Orszag()
-                        {
-                            Id = -1,
-                            Nev = $"Nincs ilyen azonosítójú ország"
-                        };
-                        return NotFound(hiba);
-                    }
-                }
-                catch (Exception ex)
+                    Id = -1,
+                    Nev = "Nincs ilyen azonosítójú ország"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new Orszag
                 {
-                    Orszag hiba = new Orszag()
-                    {
-                        Id = -1,
-                        Nev = $"Hiba a betöltés közben: {ex.Message}"
-                    };
-                    return BadRequest(hiba);
-                }
+                    Id = -1,
+                    Nev = $"Hiba a betöltés közben: {ex.Message}"
+                });
             }
         }
 
         [HttpPost("UjOrszag")]
-        public IActionResult PostOrszag(Orszag orszag) 
-        { 
-            using (var context = new OlimpikonokContext())
+        public IActionResult PostOrszag(Orszag orszag)
+        {
+            try
             {
-                try
-                {
-                    context.Orszags.Add(orszag);
-                    context.SaveChanges();
-                    return Ok("Sikers rögzítés.");
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest($"Hiba a rögzítés közben: {ex.Message}");
-                }
+                _context.Orszags.Add(orszag);
+                _context.SaveChanges();
+                return Ok("Sikeres rögzítés.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hiba a rögzítés közben: {ex.Message}");
             }
         }
 
         [HttpPut("ModositOrszag")]
         public IActionResult PutOrszag(Orszag orszag)
         {
-            using (var context = new OlimpikonokContext())
+            try
             {
-                try
-                {
-                    
-                    if (context.Orszags.Select(o => o.Id).Contains(orszag.Id))
-                        {
-                        context.Orszags.Update(orszag);
-                        context.SaveChanges();
-                        return Ok("Sikeres módosítás.");
-                    }
-                    else
-                    {
-                        return NotFound("Nincs ilyen ország.");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest($"Hiba a módosítás közben: {ex.Message}");
-                }
+                var letezo = _context.Orszags.Any(o => o.Id == orszag.Id);
+                if (!letezo)
+                    return NotFound("Nincs ilyen ország.");
+
+                _context.Orszags.Update(orszag);
+                _context.SaveChanges();
+                return Ok("Sikeres módosítás.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hiba a módosítás közben: {ex.Message}");
             }
         }
 
         [HttpDelete("TorolOrszag")]
         public IActionResult DeleteOrszag(int id)
         {
-            using (var context = new OlimpikonokContext())
+            try
             {
-                try
-                {
+                var letezo = _context.Orszags.Any(o => o.Id == id);
+                if (!letezo)
+                    return NotFound("Nincs ilyen ország.");
 
-                    if (context.Orszags.Select(o => o.Id).Contains(id))
-                    {
-                        Orszag torlendo = new Orszag { Id = id };
-                        context.Orszags.Remove(torlendo);
-                        context.SaveChanges();
-                        return Ok("Sikeres törlés.");
-                    }
-                    else
-                    {
-                        return NotFound("Nincs ilyen ország.");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest($"Hiba a törlés közben: {ex.Message}");
-                }
+                var torlendo = new Orszag { Id = id };
+                _context.Orszags.Remove(torlendo);
+                _context.SaveChanges();
+                return Ok("Sikeres törlés.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hiba a törlés közben: {ex.Message}");
             }
         }
     }
 }
+
